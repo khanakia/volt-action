@@ -1,0 +1,38 @@
+# volt-action — install the released volt binary and run one command.
+# The pipeline logic lives in the binary (voltkit ADR-R07); this action is
+# deliberately dumb: download, verify checksum, run.
+name: volt
+description: Install the volt binary (checksum-verified) and run a volt command
+branding: { icon: zap, color: yellow }
+inputs:
+  args:
+    description: "volt subcommand and arguments, e.g. 'ci' or 'release --from-tag notes/v1.4.0'"
+    default: "ci"
+  version:
+    description: "volt release tag to install (a voltkit volt/vX.Y.Z tag). The default is the known-good version this action revision ships with — bumped by moving the action's v1 tag, so consumers update by doing nothing."
+    default: "volt/v0.1.0"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      # Every value crosses into the script via env:, never inline ${{ }} —
+      # inline expansion executes backticks in the value (see voltkit's
+      # RELEASE_PIPELINE_SPEC "Gotchas paid for already").
+      env:
+        VER: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        # Asset names carry the bare version (volt_v0.1.0_...), while the tag
+        # is prefixed (volt/v0.1.0) — split off the prefix for the filename.
+        bare="${VER##*/}"
+        base="https://github.com/khanakia/voltkit/releases/download/${VER}"
+        asset="volt_${bare}_linux_amd64.tar.gz"
+        curl -fsSL -o "/tmp/${asset}" "${base}/${asset}"
+        curl -fsSL -o /tmp/volt-checksums.txt "${base}/checksums.txt"
+        (cd /tmp && grep " ${asset}\$" volt-checksums.txt | sha256sum -c - >/dev/null)
+        sudo tar xzf "/tmp/${asset}" -C /usr/local/bin volt
+        volt --version
+    - shell: bash
+      env:
+        ARGS: ${{ inputs.args }}
+      run: volt $ARGS
