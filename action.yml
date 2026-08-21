@@ -35,4 +35,7 @@ runs:
     - shell: bash
       env:
         ARGS: ${{ inputs.args }}
+        # volt publishes through the gh CLI, which reads GH_TOKEN. The
+        # workflow's job-level `permissions:` decide what this token may do.
+        GH_TOKEN: ${{ github.token }}
       run: volt $ARGS
