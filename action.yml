@@ -10,7 +10,7 @@ inputs:
     default: "ci"
   version:
     description: "volt release tag to install (a voltkit volt/vX.Y.Z tag). The default is the known-good version this action revision ships with — bumped by moving the action's v1 tag, so consumers update by doing nothing."
-    default: "volt/v0.1.0"
+    default: "volt/v0.2.0"
 runs:
   using: composite
   steps:
@@ -23,7 +23,7 @@ runs:
       run: |
         set -euo pipefail
         # Asset names carry the bare version (volt_v0.1.0_...), while the tag
-        # is prefixed (volt/v0.1.0) — split off the prefix for the filename.
+        # is prefixed (volt/v0.2.0) — split off the prefix for the filename.
         bare="${VER##*/}"
         base="https://github.com/khanakia/voltkit/releases/download/${VER}"
         asset="volt_${bare}_linux_amd64.tar.gz"
