@@ -10,7 +10,7 @@ inputs:
     default: "ci"
   version:
     description: "volt release tag to install (a voltkit volt/vX.Y.Z tag). The default is the known-good version this action revision ships with — bumped by moving the action's v1 tag, so consumers update by doing nothing."
-    default: "volt/v0.4.0"
+    default: "volt/v0.5.0"
 runs:
   using: composite
   steps:
